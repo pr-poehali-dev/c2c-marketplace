@@ -1,21 +1,207 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
+import AuthModal from '@/components/AuthModal';
+import CreateListingModal from '@/components/CreateListingModal';
+import { auth } from '@/lib/auth';
+import { db, CATEGORIES, Listing, CategoryKey, User } from '@/lib/db';
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState('home');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  
+  // Modals
+  const [showAuth, setShowAuth] = useState(false);
   const [showCreateListing, setShowCreateListing] = useState(false);
   const [showPhotoSell, setShowPhotoSell] = useState(false);
   const [showExchange, setShowExchange] = useState(false);
+  
+  // Search filters
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+
+  useEffect(() => {
+    setCurrentUser(auth.getCurrentUser());
+    loadListings();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, selectedCategory, minPrice, maxPrice, selectedLocation, listings]);
+
+  const loadListings = () => {
+    const allListings = db.getListings().filter(listing => listing.status === 'active');
+    setListings(allListings);
+  };
+
+  const applyFilters = () => {
+    let filtered = [...listings];
+
+    if (searchQuery) {
+      filtered = db.searchListings(searchQuery);
+    }
+
+    if (selectedCategory && selectedCategory !== 'all') {
+      filtered = filtered.filter(listing => listing.category === selectedCategory);
+    }
+
+    if (minPrice) {
+      const min = parseFloat(minPrice);
+      if (!isNaN(min)) {
+        filtered = filtered.filter(listing => listing.price >= min);
+      }
+    }
+
+    if (maxPrice) {
+      const max = parseFloat(maxPrice);
+      if (!isNaN(max)) {
+        filtered = filtered.filter(listing => listing.price <= max);
+      }
+    }
+
+    if (selectedLocation) {
+      filtered = filtered.filter(listing => 
+        listing.location.toLowerCase().includes(selectedLocation.toLowerCase())
+      );
+    }
+
+    setFilteredListings(filtered);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyFilters();
+  };
+
+  const handleCreateListing = () => {
+    if (!currentUser) {
+      setShowAuth(true);
+      return;
+    }
+    setShowCreateListing(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setCurrentUser(auth.getCurrentUser());
+  };
+
+  const handleListingSuccess = () => {
+    loadListings();
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
+  };
+
+  const getConditionText = (condition: string) => {
+    const conditions = {
+      new: 'Новое',
+      excellent: 'Отличное', 
+      good: 'Хорошее',
+      fair: 'Удовлетворительное',
+      poor: 'Плохое'
+    };
+    return conditions[condition as keyof typeof conditions] || condition;
+  };
+
+  const getUserById = (userId: string) => {
+    return db.getUserById(userId);
+  };
+
+  const renderListingCard = (listing: Listing) => {
+    const seller = getUserById(listing.userId);
+    
+    return (
+      <Card key={listing.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+        <div className="relative">
+          <img
+            src={listing.images[0] || '/placeholder.svg'}
+            alt={listing.title}
+            className="w-full h-48 object-cover rounded-t-lg"
+          />
+          <div className="absolute top-2 right-2">
+            <Button size="sm" variant="ghost" className="w-8 h-8 p-0 bg-white/80 hover:bg-white">
+              <Icon name="Heart" size={14} />
+            </Button>
+          </div>
+          <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+            <Icon name="Eye" size={12} className="inline mr-1" />
+            {listing.views}
+          </div>
+        </div>
+        
+        <CardContent className="p-4">
+          <div className="flex items-start justify-between mb-2">
+            <Badge variant="outline" className="text-xs">
+              {getConditionText(listing.condition)}
+            </Badge>
+            <div className="flex items-center space-x-1">
+              {seller?.verified && (
+                <Icon name="BadgeCheck" size={14} className="text-accent" />
+              )}
+              <span className="text-xs text-gray-500 flex items-center">
+                <Icon name="Star" size={12} className="text-warning mr-1" />
+                {seller?.rating.toFixed(1) || '5.0'}
+              </span>
+            </div>
+          </div>
+          
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+            {listing.title}
+          </h3>
+          
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xl font-bold text-primary">
+              {formatPrice(listing.price)}
+            </span>
+            <Badge variant="secondary" className="text-xs">
+              {CATEGORIES[listing.category as CategoryKey]}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+            <div className="flex items-center space-x-1">
+              <Icon name="MapPin" size={12} />
+              <span>{listing.location}</span>
+            </div>
+            <span>{seller?.name || 'Пользователь'}</span>
+          </div>
+
+          {listing.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {listing.tags.slice(0, 3).map((tag, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+          
+          <div className="flex space-x-2">
+            <Button size="sm" className="flex-1">
+              <Icon name="MessageCircle" size={14} className="mr-1" />
+              Написать
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1">
+              <Icon name="Phone" size={14} className="mr-1" />
+              Позвонить
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const navigationItems = [
     { name: 'Главная', icon: 'Home', page: 'home' },
@@ -218,18 +404,75 @@ const Index = () => {
       case 'catalog':
         return (
           <div>
-            <h2 className="text-2xl font-bold mb-6">Каталог товаров</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-              {categories.map((category) => (
-                <Card key={category.name} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-6 text-center">
-                    <Icon name={category.icon as any} size={32} className="mx-auto mb-3 text-primary" />
-                    <h3 className="font-semibold mb-1">{category.name}</h3>
-                    <p className="text-sm text-gray-500">{category.count}</p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Каталог товаров</h2>
+              <p className="text-gray-600">{filteredListings.length} объявлений</p>
             </div>
+
+            {/* Фильтры */}
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Все категории" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Все категории</SelectItem>
+                        {Object.entries(CATEGORIES).map(([key, name]) => (
+                          <SelectItem key={key} value={key}>{name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Мин. цена"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Макс. цена"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Город"
+                      value={selectedLocation}
+                      onChange={(e) => setSelectedLocation(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredListings.map(renderListingCard)}
+            </div>
+
+            {filteredListings.length === 0 && (
+              <div className="text-center py-12">
+                <Icon name="Search" size={48} className="mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Ничего не найдено</h3>
+                <p className="text-gray-600 mb-4">Попробуйте изменить параметры поиска</p>
+                <Button onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                  setMinPrice('');
+                  setMaxPrice('');
+                  setSelectedLocation('');
+                }}>
+                  Сбросить фильтры
+                </Button>
+              </div>
+            )}
           </div>
         );
       
@@ -237,29 +480,22 @@ const Index = () => {
         return (
           <div>
             <h2 className="text-2xl font-bold mb-6">Сообщения</h2>
-            <div className="space-y-4">
-              {messages.map((msg) => (
-                <Card key={msg.id} className={`cursor-pointer hover:shadow-md transition-shadow ${msg.unread ? 'border-primary' : ''}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{msg.user[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-semibold">{msg.user}</p>
-                          <p className="text-gray-600">{msg.message}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500">{msg.time}</p>
-                        {msg.unread && <div className="w-2 h-2 bg-primary rounded-full ml-auto mt-1"></div>}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {!currentUser ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Icon name="MessageCircle" size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-4">Войдите в аккаунт, чтобы просматривать сообщения</p>
+                  <Button onClick={() => setShowAuth(true)}>Войти</Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Icon name="MessageCircle" size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Пока нет сообщений</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         );
       
@@ -370,23 +606,24 @@ const Index = () => {
                   Безопасная торговая платформа
                 </h2>
                 <p className="text-xl text-gray-600 mb-8">
-                  Покупайте и продавайте с гарантией безопасности. ИИ-модерация, escrow-платежи, проверенные продавцы.
+                  Покупайте и продавайте с гарантией безопасности. Реальные пользователи, реальные товары.
                 </p>
                 
-                <div className="relative max-w-2xl mx-auto">
+                <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
                   <div className="flex">
                     <Input
                       type="text"
-                      placeholder="Поиск товаров... (ИИ подскажет лучшие варианты)"
+                      placeholder="Поиск товаров... (например: iPhone, Nike, Samsung)"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="text-lg h-14 pr-32"
                     />
-                    <Button className="absolute right-1 top-1 h-12 px-6">
+                    <Button type="submit" className="absolute right-1 top-1 h-12 px-6">
                       <Icon name="Search" size={20} className="mr-2" />
                       Найти
                     </Button>
                   </div>
+                </form>
                   
                   <div className="flex items-center justify-center space-x-6 mt-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
@@ -616,12 +853,29 @@ const Index = () => {
               </div>
               
               <div className="flex items-center space-x-3">
-                <Button variant="ghost" size="sm">
-                  <Icon name="Bell" size={16} />
-                </Button>
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-primary text-white text-sm">ИП</AvatarFallback>
-                </Avatar>
+                {currentUser ? (
+                  <>
+                    <Button variant="ghost" size="sm">
+                      <Icon name="Bell" size={16} />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setCurrentPage('profile')}
+                    >
+                      <Avatar className="w-6 h-6">
+                        <AvatarFallback className="text-xs">
+                          {currentUser.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={() => setShowAuth(true)} size="sm">
+                    <Icon name="User" size={16} className="mr-2" />
+                    Войти
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -693,9 +947,21 @@ const Index = () => {
       </footer>
 
       {/* Modals */}
-      {showCreateListing && <CreateListingModal />}
-      {showPhotoSell && <PhotoSellModal />}
-      {showExchange && <ExchangeModal />}
+      {showAuth && (
+        <AuthModal 
+          isOpen={showAuth} 
+          onClose={() => setShowAuth(false)}
+          onSuccess={handleAuthSuccess}
+        />
+      )}
+      
+      {showCreateListing && (
+        <CreateListingModal 
+          isOpen={showCreateListing} 
+          onClose={() => setShowCreateListing(false)}
+          onSuccess={handleListingSuccess}
+        />
+      )}
     </div>
   );
 };
