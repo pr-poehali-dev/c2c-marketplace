@@ -548,12 +548,15 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setCurrentPage('home')}
+                className="flex items-center space-x-3"
+              >
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Icon name="ShoppingBag" size={18} className="text-white" />
                 </div>
                 <h1 className="text-xl font-bold text-gray-900">Swoply</h1>
-              </div>
+              </button>
               
               <nav className="hidden md:flex space-x-6">
                 {navigationItems.map((item) => (
