@@ -211,193 +211,9 @@ const Index = () => {
     { name: 'Профиль', icon: 'User', page: 'profile' },
   ];
 
-  const categories = [
-    { name: 'Электроника', icon: 'Smartphone', count: '12К+' },
-    { name: 'Одежда', icon: 'Shirt', count: '8К+' },
-    { name: 'Дом и сад', icon: 'Home', count: '5К+' },
-    { name: 'Транспорт', icon: 'Car', count: '3К+' },
-    { name: 'Спорт', icon: 'Dumbbell', count: '2К+' },
-    { name: 'Книги', icon: 'Book', count: '1К+' },
-  ];
 
-  const featuredProducts = [
-    {
-      id: 1,
-      title: 'iPhone 14 Pro Max 256GB',
-      price: '85 000 ₽',
-      location: 'Москва',
-      seller: 'Анна К.',
-      rating: 4.9,
-      verified: true,
-      image: '/img/b35ae446-c430-4e89-b093-4a5879e31684.jpg',
-      condition: 'Отличное',
-      views: 245,
-      isFlashSale: true,
-      discount: 15,
-      originalPrice: '100 000 ₽'
-    },
-    {
-      id: 2,
-      title: 'Куртка зимняя North Face XL',
-      price: '12 500 ₽',
-      location: 'СПб',
-      seller: 'Михаил Р.',
-      rating: 4.7,
-      verified: true,
-      image: '/img/df5de5b4-122d-4524-8374-5ad821c8fed2.jpg',
-      condition: 'Хорошее',
-      views: 128,
-      isFlashSale: false
-    },
-    {
-      id: 3,
-      title: 'MacBook Air M2 512GB',
-      price: '95 000 ₽',
-      location: 'Екатеринбург',
-      seller: 'Елена В.',
-      rating: 5.0,
-      verified: true,
-      image: '/img/01098b5a-6639-438f-9840-72bec186cc2d.jpg',
-      condition: 'Как новое',
-      views: 189,
-      isFlashSale: true,
-      discount: 10,
-      originalPrice: '105 000 ₽'
-    },
-    {
-      id: 4,
-      title: 'Велосипед горный Trek 29"',
-      price: '45 000 ₽',
-      location: 'Казань',
-      seller: 'Дмитрий П.',
-      rating: 4.8,
-      verified: false,
-      image: '/placeholder.svg',
-      condition: 'Хорошее',
-      views: 96,
-      isFlashSale: false
-    }
-  ];
 
-  const messages = [
-    { id: 1, user: 'Анна К.', message: 'Добрый день! iPhone еще актуален?', time: '2 мин назад', unread: true },
-    { id: 2, user: 'Михаил Р.', message: 'Спасибо за покупку!', time: '1 час назад', unread: false },
-    { id: 3, user: 'Елена В.', message: 'Можно встретиться завтра?', time: '3 часа назад', unread: true },
-  ];
 
-  const favorites = [
-    { id: 1, title: 'iPhone 13 Pro 128GB', price: '65 000 ₽', image: '/img/b35ae446-c430-4e89-b093-4a5879e31684.jpg' },
-    { id: 2, title: 'Кроссовки Nike Air Max', price: '8 500 ₽', image: '/placeholder.svg' },
-    { id: 3, title: 'Наушники Sony WH-1000XM4', price: '15 000 ₽', image: '/placeholder.svg' },
-  ];
-
-  const CreateListingModal = () => (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Разместить объявление</CardTitle>
-          <CardDescription>Создайте новое объявление для продажи</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="title">Название товара</Label>
-            <Input id="title" placeholder="Например: iPhone 14 Pro Max" />
-          </div>
-          <div>
-            <Label htmlFor="price">Цена (₽)</Label>
-            <Input id="price" type="number" placeholder="50000" />
-          </div>
-          <div>
-            <Label htmlFor="category">Категория</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите категорию" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="electronics">Электроника</SelectItem>
-                <SelectItem value="clothing">Одежда</SelectItem>
-                <SelectItem value="home">Дом и сад</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="description">Описание</Label>
-            <Textarea id="description" placeholder="Подробное описание товара..." />
-          </div>
-          <div className="flex space-x-2">
-            <Button onClick={() => setShowCreateListing(false)} className="flex-1">
-              Опубликовать
-            </Button>
-            <Button onClick={() => setShowCreateListing(false)} variant="outline">
-              Отмена
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const PhotoSellModal = () => (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Продать по фото</CardTitle>
-          <CardDescription>ИИ определит товар и создаст объявление автоматически</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <Icon name="Camera" size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600 mb-4">Загрузите фото товара</p>
-            <Button variant="outline">
-              <Icon name="Upload" size={16} className="mr-2" />
-              Выбрать фото
-            </Button>
-          </div>
-          <div className="flex space-x-2">
-            <Button onClick={() => setShowPhotoSell(false)} className="flex-1">
-              Анализировать
-            </Button>
-            <Button onClick={() => setShowPhotoSell(false)} variant="outline">
-              Отмена
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const ExchangeModal = () => (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Предложить обмен</CardTitle>
-          <CardDescription>Обменяйте свой товар на нужный</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label>Что предлагаете</Label>
-            <Input placeholder="Например: MacBook Pro 13" />
-          </div>
-          <div>
-            <Label>На что хотите обменять</Label>
-            <Input placeholder="Например: iPhone 14" />
-          </div>
-          <div>
-            <Label>Доплата (если нужна)</Label>
-            <Input type="number" placeholder="10000" />
-          </div>
-          <div className="flex space-x-2">
-            <Button onClick={() => setShowExchange(false)} className="flex-1">
-              Предложить
-            </Button>
-            <Button onClick={() => setShowExchange(false)} variant="outline">
-              Отмена
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
 
   const renderContent = () => {
     switch (currentPage) {
@@ -503,21 +319,22 @@ const Index = () => {
         return (
           <div>
             <h2 className="text-2xl font-bold mb-6">Избранное</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {favorites.map((item) => (
-                <Card key={item.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <img src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-t-lg" />
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">{item.title}</h3>
-                    <p className="text-xl font-bold text-primary">{item.price}</p>
-                    <Button className="w-full mt-3">
-                      <Icon name="MessageCircle" size={16} className="mr-2" />
-                      Написать
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {!currentUser ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Icon name="Heart" size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-4">Войдите в аккаунт, чтобы сохранять избранные товары</p>
+                  <Button onClick={() => setShowAuth(true)}>Войти</Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Icon name="Heart" size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Пока нет избранных товаров</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         );
       
@@ -525,74 +342,71 @@ const Index = () => {
         return (
           <div>
             <h2 className="text-2xl font-bold mb-6">Профиль</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {!currentUser ? (
               <Card>
-                <CardContent className="p-6 text-center">
-                  <Avatar className="w-20 h-20 mx-auto mb-4">
-                    <AvatarFallback className="text-2xl">ИП</AvatarFallback>
-                  </Avatar>
-                  <h3 className="text-xl font-semibold mb-2">Иван Петров</h3>
-                  <div className="flex items-center justify-center space-x-1 mb-2">
-                    <Icon name="Star" size={16} className="text-warning" />
-                    <span className="font-semibold">4.9</span>
-                    <span className="text-gray-500">(127 отзывов)</span>
-                  </div>
-                  <Badge className="mb-4">
-                    <Icon name="BadgeCheck" size={14} className="mr-1" />
-                    Верифицирован
-                  </Badge>
-                  <Button className="w-full">Редактировать профиль</Button>
+                <CardContent className="p-8 text-center">
+                  <Icon name="User" size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-4">Войдите в аккаунт, чтобы управлять профилем</p>
+                  <Button onClick={() => setShowAuth(true)}>Войти</Button>
                 </CardContent>
               </Card>
-              
-              <div className="lg:col-span-2 space-y-6">
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Статистика</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <p className="text-2xl font-bold text-primary">47</p>
-                        <p className="text-sm text-gray-600">Продано</p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-accent">12</p>
-                        <p className="text-sm text-gray-600">Активных</p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-warning">5</p>
-                        <p className="text-sm text-gray-600">Избранное</p>
-                      </div>
+                  <CardContent className="p-6 text-center">
+                    <Avatar className="w-20 h-20 mx-auto mb-4">
+                      <AvatarFallback className="text-2xl">
+                        {currentUser.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-xl font-semibold mb-2">{currentUser.name}</h3>
+                    <p className="text-gray-600 mb-2">{currentUser.email}</p>
+                    <div className="flex items-center justify-center space-x-1 mb-4">
+                      <Icon name="Star" size={16} className="text-warning" />
+                      <span className="font-semibold">{currentUser.rating}</span>
+                      <span className="text-gray-500">({currentUser.reviewsCount} отзывов)</span>
                     </div>
+                    {currentUser.verified && (
+                      <Badge className="mb-4">
+                        <Icon name="BadgeCheck" size={14} className="mr-1" />
+                        Верифицирован
+                      </Badge>
+                    )}
+                    <Button 
+                      className="w-full mb-2"
+                      onClick={() => auth.logout() && setCurrentUser(null)}
+                    >
+                      Выйти
+                    </Button>
                   </CardContent>
                 </Card>
                 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Мои объявления</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <p className="font-semibold">iPhone 14 Pro Max</p>
-                          <p className="text-sm text-gray-600">85 000 ₽ • 245 просмотров</p>
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Мои объявления</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {currentUser ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {db.getListingsByUserId(currentUser.id).map(renderListingCard)}
                         </div>
-                        <Badge>Активно</Badge>
-                      </div>
-                      <div className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <p className="font-semibold">MacBook Air M2</p>
-                          <p className="text-sm text-gray-600">95 000 ₽ • 189 просмотров</p>
+                      ) : null}
+                      {db.getListingsByUserId(currentUser.id).length === 0 && (
+                        <div className="text-center py-8">
+                          <Icon name="Package" size={48} className="mx-auto text-gray-400 mb-4" />
+                          <p className="text-gray-600 mb-4">У вас пока нет объявлений</p>
+                          <Button onClick={handleCreateListing}>
+                            <Icon name="Plus" size={16} className="mr-2" />
+                            Создать объявление
+                          </Button>
                         </div>
-                        <Badge variant="secondary">Продано</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         );
       
@@ -650,163 +464,76 @@ const Index = () => {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center">
                       <Icon name="Grid3x3" size={20} className="mr-2" />
-                      Категории
+                      Быстрые действия
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category.name}
-                        onClick={() => setCurrentPage('catalog')}
-                        className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Icon name={category.icon as any} size={18} className="text-gray-600" />
-                          <span className="font-medium">{category.name}</span>
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {category.count}
-                        </Badge>
-                      </button>
-                    ))}
+                  <CardContent className="space-y-3">
+                    <Button onClick={handleCreateListing} className="w-full justify-start" size="sm">
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Разместить объявление
+                    </Button>
+                    <Button onClick={() => setCurrentPage('catalog')} variant="outline" className="w-full justify-start" size="sm">
+                      <Icon name="Search" size={16} className="mr-2" />
+                      Все товары
+                    </Button>
+                    {!currentUser && (
+                      <Button onClick={() => setShowAuth(true)} variant="outline" className="w-full justify-start" size="sm">
+                        <Icon name="User" size={16} className="mr-2" />
+                        Войти / Регистрация
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Быстрые действия</CardTitle>
+                    <CardTitle className="text-lg flex items-center">
+                      <Icon name="BarChart3" size={20} className="mr-2" />
+                      Статистика
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button onClick={() => setShowCreateListing(true)} className="w-full justify-start" size="sm">
-                      <Icon name="Plus" size={16} className="mr-2" />
-                      Разместить объявление
-                    </Button>
-                    <Button onClick={() => setShowPhotoSell(true)} variant="outline" className="w-full justify-start" size="sm">
-                      <Icon name="Camera" size={16} className="mr-2" />
-                      Продать по фото
-                    </Button>
-                    <Button onClick={() => setShowExchange(true)} variant="outline" className="w-full justify-start" size="sm">
-                      <Icon name="ArrowLeftRight" size={16} className="mr-2" />
-                      Предложить обмен
-                    </Button>
+                  <CardContent className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary">{listings.length}</p>
+                      <p className="text-sm text-gray-600">Активных объявлений</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-accent">{db.getUsers().length}</p>
+                      <p className="text-sm text-gray-600">Зарегистрированных пользователей</p>
+                    </div>
                   </CardContent>
                 </Card>
               </aside>
 
               {/* Content Area */}
               <div className="lg:col-span-3">
-                <Tabs defaultValue="featured" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="featured">Рекомендации</TabsTrigger>
-                    <TabsTrigger value="flash">
-                      <Icon name="Zap" size={16} className="mr-1" />
-                      Флеш-распродажи
-                    </TabsTrigger>
-                    <TabsTrigger value="new">Новинки</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="featured" className="mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {featuredProducts.map((product) => (
-                        <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-                          <div className="relative">
-                            <img
-                              src={product.image}
-                              alt={product.title}
-                              className="w-full h-48 object-cover rounded-t-lg"
-                            />
-                            {product.isFlashSale && (
-                              <div className="absolute top-2 left-2">
-                                <Badge className="bg-error text-white">
-                                  <Icon name="Zap" size={12} className="mr-1" />
-                                  -{product.discount}%
-                                </Badge>
-                              </div>
-                            )}
-                            <div className="absolute top-2 right-2">
-                              <Button size="sm" variant="ghost" className="w-8 h-8 p-0 bg-white/80 hover:bg-white">
-                                <Icon name="Heart" size={14} />
-                              </Button>
-                            </div>
-                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                              <Icon name="Eye" size={12} className="inline mr-1" />
-                              {product.views}
-                            </div>
-                          </div>
-                          
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-2">
-                              <Badge variant="outline" className="text-xs">
-                                {product.condition}
-                              </Badge>
-                              <div className="flex items-center space-x-1">
-                                {product.verified && (
-                                  <Icon name="BadgeCheck" size={14} className="text-accent" />
-                                )}
-                                <span className="text-xs text-gray-500 flex items-center">
-                                  <Icon name="Star" size={12} className="text-warning mr-1" />
-                                  {product.rating}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                              {product.title}
-                            </h3>
-                            
-                            <div className="flex items-center justify-between mb-3">
-                              <div>
-                                {product.isFlashSale && (
-                                  <span className="text-sm text-gray-500 line-through mr-2">
-                                    {product.originalPrice}
-                                  </span>
-                                )}
-                                <span className="text-xl font-bold text-gray-900">
-                                  {product.price}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-sm text-gray-600">
-                              <div className="flex items-center space-x-1">
-                                <Icon name="MapPin" size={12} />
-                                <span>{product.location}</span>
-                              </div>
-                              <span>{product.seller}</span>
-                            </div>
-                            
-                            <div className="flex space-x-2 mt-4">
-                              <Button size="sm" className="flex-1">
-                                <Icon name="MessageCircle" size={14} className="mr-1" />
-                                Написать
-                              </Button>
-                              <Button size="sm" variant="outline" className="flex-1">
-                                <Icon name="Phone" size={14} className="mr-1" />
-                                Звонок
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="flash" className="mt-6">
-                    <div className="text-center py-12">
-                      <Icon name="Zap" size={48} className="mx-auto text-warning mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Флеш-распродажи</h3>
-                      <p className="text-gray-600">Ограниченные по времени предложения со скидками до 50%</p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="new" className="mt-6">
-                    <div className="text-center py-12">
-                      <Icon name="Plus" size={48} className="mx-auto text-primary mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Новые поступления</h3>
-                      <p className="text-gray-600">Свежие объявления от проверенных продавцов</p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-bold">Последние объявления</h3>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setCurrentPage('catalog')}
+                  >
+                    Смотреть все
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredListings.slice(0, 6).map(renderListingCard)}
+                </div>
+
+                {filteredListings.length === 0 && (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <Icon name="Package" size={48} className="mx-auto text-gray-400 mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">Пока нет объявлений</h3>
+                      <p className="text-gray-600 mb-4">Станьте первым, кто разместит товар на платформе!</p>
+                      <Button onClick={handleCreateListing}>
+                        <Icon name="Plus" size={16} className="mr-2" />
+                        Создать первое объявление
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </>
