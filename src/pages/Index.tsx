@@ -438,22 +438,6 @@ const Index = () => {
                     </Button>
                   </div>
                 </form>
-                  
-                  <div className="flex items-center justify-center space-x-6 mt-4 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      <Icon name="Sparkles" size={14} className="text-accent" />
-                      <span>ИИ-поиск</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Icon name="MapPin" size={14} className="text-primary" />
-                      <span>Геолокация</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Icon name="Clock" size={14} className="text-warning" />
-                      <span>Быстрая продажа</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </section>
 
